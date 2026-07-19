@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pythos — In-VPC Managed Inference Platform</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg2: #111834;
+    --ink: #e8edff;
+    --muted: #8a97c4;
+    --edge: #2a3358;
+    --node: #4f6bff;
+    --accent: #fc8147;
+    --warn: #ff9e57;
+    --pythos: #fc8147;
+    /* vertex colors: R = Data Privacy, G = Model Richness, B = Low Net Cost */
+    --rc: #ff5b6b;
+    --gc: #35d07f;
+    --bc: #4d7cff;
+  }
+  :root[data-theme="light"] {
+    --bg: #f3f5fb;
+    --bg2: #ffffff;
+    --ink: #131a30;
+    --muted: #5b6690;
+    --edge: #ccd3ea;
+    --warn: #d97a2c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(1200px 800px at 50% 30%, var(--bg2), var(--bg) 70%);
+    color: var(--ink);
+    font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .stage {
+    position: relative;
+    width: min(92vw, 760px);
+    height: min(80vh, 620px);
+  }
+
+  h1 {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: clamp(20px, 3.4vw, 30px);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    transform: translateY(-10px);
+    animation: rise 0.9s 0.1s ease-out forwards;
+  }
+  h1 .brand { color: var(--pythos); }
+  h1 .sub {
+    display: block;
+    font-size: clamp(12px, 1.7vw, 15px);
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 6px;
+    letter-spacing: 0.3px;
+  }
+
+  .tri-wrap {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    bottom: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  svg.scene {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .edge {
+    stroke: var(--edge);
+    stroke-width: 3;
+    fill: none;
+    stroke-linecap: round;
+    stroke-dasharray: 520;
+    stroke-dashoffset: 520;
+    opacity: 0;
+  }
+  .edge.run { animation: draw 0.9s ease-out forwards; }
+
+  .edge.glow {
+    stroke: var(--accent);
+    stroke-width: 5;
+    filter: drop-shadow(0 0 8px rgba(0,229,192,0.55));
+  }
+
+  .sol-label {
+    font-size: 13px;
+    fill: var(--muted);
+    text-anchor: middle;
+    opacity: 0;
+  }
+  .sol-label.show { animation: fade 0.6s ease-out forwards; }
+
+  /* the third need each edge-solution fails to cover */
+  .miss-label {
+    font-size: 11px;
+    font-weight: 600;
+    fill: var(--warn);
+    text-anchor: middle;
+    opacity: 0;
+  }
+  .miss-label.show { animation: fade 0.6s ease-out forwards; }
+
+  .node {
+    fill: var(--node);
+    stroke: var(--bg);
+    stroke-width: 4;
+    filter: drop-shadow(0 0 10px rgba(79,107,255,0.5));
+    transform-origin: center;
+    transform-box: fill-box;
+    opacity: 0;
+  }
+  .node.pop { animation: pop 0.5s cubic-bezier(.2,1.4,.4,1) forwards; }
+  /* R / G / B vertices */
+  .n1 { fill: var(--rc); filter: drop-shadow(0 0 10px rgba(255,91,107,0.6)); }
+  .n2 { fill: var(--gc); filter: drop-shadow(0 0 10px rgba(53,208,127,0.6)); }
+  .n3 { fill: var(--bc); filter: drop-shadow(0 0 10px rgba(77,124,255,0.6)); }
+  /* edges blend between the two vertex colors they connect */
+  .e1 { stroke: url(#grad1); }
+  .e2 { stroke: url(#grad2); }
+  .e3 { stroke: url(#grad3); }
+
+  .node-label {
+    font-size: 15px;
+    font-weight: 600;
+    fill: var(--ink);
+    text-anchor: middle;
+    opacity: 0;
+  }
+  .node-label.show { animation: fade 0.6s ease-out forwards; }
+  .node-sub {
+    font-size: 11px;
+    fill: var(--muted);
+    text-anchor: middle;
+    opacity: 0;
+  }
+  .node-sub.show { animation: fade 0.6s ease-out forwards; }
+
+  .pythos-core {
+    transform-origin: center;
+    transform-box: fill-box;
+    opacity: 0;
+  }
+  .pythos-core.in { animation: coreIn 1s ease-out forwards, pulse 2.6s 1s ease-in-out infinite; }
+  .pythos-ring {
+    fill: none;
+    stroke: var(--pythos);
+    stroke-width: 2;
+    opacity: 0;
+    transform-origin: center;
+    transform-box: fill-box;
+  }
+  .pythos-ring.in { animation: ringExpand 1.6s ease-out forwards; }
+
+  .pythos-label {
+    text-anchor: middle;
+    opacity: 0;
+  }
+  .pythos-label.in { animation: fade 0.8s 0.6s ease-out forwards; }
+
+  .trilemma {
+    text-anchor: middle;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    fill: var(--warn);
+    opacity: 0;
+  }
+  .trilemma.show { animation: fade 0.6s ease-out forwards; }
+  .trilemma.out { animation: fadeOut 0.5s ease-in forwards; }
+  .pythos-label .name {
+    font-size: 30px;
+    font-weight: 800;
+    fill: var(--pythos);
+    letter-spacing: 1px;
+  }
+  .pythos-label .tag {
+    font-size: 12px;
+    fill: var(--ink);
+    font-weight: 500;
+  }
+
+  .footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: clamp(13px, 1.9vw, 16px);
+    color: var(--ink);
+    min-height: 44px;
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  .footer.show { animation: rise 0.7s ease-out forwards; }
+  .footer .em { color: var(--accent); font-weight: 700; }
+
+  .replay {
+    position: fixed;
+    right: 18px;
+    bottom: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--edge);
+    color: var(--muted);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.4s, color 0.2s, border-color 0.2s;
+  }
+  .replay.show { opacity: 1; }
+  .replay:hover { color: var(--ink); border-color: var(--accent); }
+
+  .theme-toggle {
+    position: fixed;
+    top: 16px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 10;
+  }
+  .theme-toggle .icon { font-size: 13px; line-height: 1; opacity: 0.75; user-select: none; }
+  .theme-toggle .switch {
+    position: relative;
+    width: 40px;
+    height: 22px;
+    display: inline-block;
+  }
+  .theme-toggle .switch input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+  .theme-toggle .slider {
+    position: absolute;
+    inset: 0;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--edge);
+    transition: background 0.25s, border-color 0.25s;
+    pointer-events: none;
+  }
+  .theme-toggle .slider::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.25s ease, background 0.25s;
+  }
+  .theme-toggle input:checked + .slider { border-color: var(--accent); }
+  .theme-toggle input:checked + .slider::before {
+    transform: translateX(18px);
+    background: var(--accent);
+  }
+  :root[data-theme="light"] .theme-toggle .slider { background: rgba(0,0,0,0.05); }
+
+  @keyframes draw { to { stroke-dashoffset: 0; opacity: 1; } }
+  @keyframes fade { to { opacity: 1; } }
+  @keyframes fadeOut { to { opacity: 0; } }
+  @keyframes pop {
+    0% { opacity: 0; transform: scale(0); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes rise {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes coreIn {
+    0% { opacity: 0; transform: scale(0.2); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  @keyframes ringExpand {
+    0% { opacity: 0.9; transform: scale(0.3); }
+    100% { opacity: 0; transform: scale(1.6); }
+  }
+
+  /* ---------- mobile / narrow screens ---------- */
+  @media (max-width: 700px) {
+    body { overflow: auto; }
+    /* stack heading, diagram and narration in normal flow instead of a fixed box */
+    .stage {
+      width: 100%;
+      height: auto;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px 12px;
+    }
+    h1 {
+      position: static;
+      font-size: clamp(19px, 6.2vw, 26px);
+      padding: 0 4px;
+    }
+    h1 .sub { font-size: clamp(12px, 3.4vw, 14px); margin-top: 8px; }
+    .tri-wrap {
+      position: static;
+      width: 100%;
+      height: auto;
+      inset: auto;
+    }
+    /* size the diagram by width so the whole viewBox (and its labels) stays visible */
+    svg.scene { width: 100%; height: auto; }
+    .footer {
+      position: static;
+      margin-top: 10px;
+      font-size: 14px;
+      padding: 0 8px;
+      transform: none;
+    }
+    .replay { right: 12px; bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="theme-toggle">
+    <span class="icon">🌙</span>
+    <label class="switch">
+      <input type="checkbox" id="themeSwitch" aria-label="Toggle light/dark theme" />
+      <span class="slider"></span>
+    </label>
+    <span class="icon">☀️</span>
+  </div>
+
+  <div class="stage">
+    <h1><span class="brand">Pythos:</span> Managed, In-VPC Inference Platform
+      <span class="sub">The Inference Trilemma: You Could Only Optimize Two of Three. Pythos Delivers All Three.</span>
+    </h1>
+
+    <div class="tri-wrap">
+      <svg class="scene" viewBox="0 0 600 500" aria-label="Needs triangle">
+        <defs>
+          <!-- gradients run along each edge, from one vertex color to the other -->
+          <linearGradient id="grad1" gradientUnits="userSpaceOnUse" x1="300" y1="110" x2="110" y2="400">
+            <stop offset="0" stop-color="#ff5b6b" />
+            <stop offset="1" stop-color="#35d07f" />
+          </linearGradient>
+          <linearGradient id="grad2" gradientUnits="userSpaceOnUse" x1="110" y1="400" x2="490" y2="400">
+            <stop offset="0" stop-color="#35d07f" />
+            <stop offset="1" stop-color="#4d7cff" />
+          </linearGradient>
+          <linearGradient id="grad3" gradientUnits="userSpaceOnUse" x1="490" y1="400" x2="300" y2="110">
+            <stop offset="0" stop-color="#4d7cff" />
+            <stop offset="1" stop-color="#ff5b6b" />
+          </linearGradient>
+        </defs>
+        <!-- edges -->
+        <line class="edge e1" x1="300" y1="110" x2="110" y2="400" />
+        <line class="edge e2" x1="110" y1="400" x2="490" y2="400" />
+        <line class="edge e3" x1="490" y1="400" x2="300" y2="110" />
+
+        <!-- solution labels on edges (each edge = a solution covering 2 of 3); all sit 24px (perpendicular) from their edge -->
+        <text class="sol-label s1" x="192" y="247" transform="rotate(-56.7 192 247)">Self-hosted</text>
+        <text class="sol-label s2" x="300" y="424">Inference vendors</text>
+        <text class="sol-label s3" x="408" y="247" transform="rotate(56.7 408 247)">Hyperscaler AI platforms</text>
+
+        <!-- the third need each edge misses, stacked one line further out, parallel to its edge -->
+
+        <!-- trilemma stamp: sits in the middle, then breaks when Pythos arrives -->
+        <text class="trilemma" x="300" y="312">TRILEMMA</text>
+
+        <!-- pythos expanding rings -->
+        <circle class="pythos-ring" cx="300" cy="300" r="70" />
+        <circle class="pythos-ring" cx="300" cy="300" r="70" />
+
+        <!-- nodes -->
+        <circle class="node n1" cx="300" cy="110" r="13" />
+        <circle class="node n2" cx="110" cy="400" r="13" />
+        <circle class="node n3" cx="490" cy="400" r="13" />
+
+        <!-- node labels -->
+        <text class="node-label l1" x="300" y="60">Data Privacy</text>
+        <text class="node-sub b1" x="300" y="78">
+          <tspan x="300" dy="0">Data stays within security perimeter</tspan>
+          <tspan x="300" dy="13">under cloud-native IAM and governance</tspan>
+        </text>
+
+        <text class="node-label l2" x="110" y="430">Inference Scalability</text>
+        <text class="node-sub b2" x="110" y="448">
+          <tspan x="110" dy="0">Low latency, high availabilility</tspan>
+          <tspan x="110" dy="13">low cost, day-0 models</tspan>
+        </text>
+
+        <text class="node-label l3" x="490" y="430">Zero Ops Overhead</text>
+        <text class="node-sub b3" x="490" y="448">
+          <tspan x="490" dy="0">Fully managed, deeply integrated</tspan>
+          <tspan x="490" dy="13">developer experience</tspan>
+        </text>
+
+        <!-- pythos core -->
+        <g class="pythos-core">
+          <circle cx="300" cy="300" r="44" fill="var(--pythos)" opacity="0.14" />
+          <g transform="translate(278.0 278.4) scale(0.196)" fill="var(--pythos)">
+            <path d="m147.83,110c0,9.9-4.01,18.85-10.5,25.34-6.48,6.48-15.44,10.5-25.34,10.5s-18.85-4.01-25.34-10.5c-6.48-6.48-10.5-15.44-10.5-25.34s4.01-18.85,10.5-25.34c6.48-6.48,15.44-10.5,25.34-10.5s18.85,4.01,25.34,10.5c6.48,6.48,10.5,15.44,10.5,25.34Z"/>
+            <path d="m112,183.32c-19.58,0-38-7.63-51.84-21.48-13.85-13.85-21.47-32.26-21.47-51.84s7.63-38,21.47-51.85c13.85-13.85,32.26-21.47,51.84-21.47s38,7.63,51.84,21.47l-18.54,18.54c-8.9-8.9-20.72-13.8-33.31-13.8s-24.41,4.9-33.3,13.8c-8.9,8.9-13.8,20.72-13.8,33.3s4.9,24.41,13.8,33.3c8.9,8.9,20.72,13.8,33.3,13.8s24.41-4.9,33.3-13.79l18.54,18.54c-13.85,13.85-32.26,21.48-51.85,21.48Z"/>
+            <path d="m112,220.28c-29.46,0-57.15-11.47-77.98-32.3C13.19,167.15,1.72,139.46,1.72,110h27.71c0,22.05,8.59,42.79,24.18,58.38,15.59,15.59,36.33,24.18,58.38,24.18s42.79-8.59,58.38-24.18c15.59-15.59,24.18-36.33,24.18-58.38s-8.59-42.79-24.18-58.38c-15.6-15.59-36.33-24.18-58.38-24.18V-.28c29.46,0,57.15,11.47,77.98,32.3,20.83,20.83,32.3,48.52,32.3,77.98s-11.47,57.15-32.3,77.98c-20.83,20.83-48.52,32.3-77.98,32.3Z"/>
+          </g>
+        </g>
+        <g class="pythos-label">
+          <text class="name" x="300" y="248">Pythos</text>
+          <text class="tag" x="300" y="362">Break the trilemma.</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="footer" id="footer"></div>
+  </div>
+
+  <button class="replay" id="replay">↻ Replay</button>
+
+<script>
+  const $ = (s) => document.querySelector(s);
+  const footer = $('#footer');
+  const replay = $('#replay');
+
+  const scenes = [
+    { t: 6.0,  msg: '<span class="em">Pythos</span> breaks the trilemma.' },
+  ];
+
+  function setText(html) {
+    footer.innerHTML = html;
+    footer.classList.remove('show');
+    void footer.offsetWidth;
+    footer.classList.add('show');
+  }
+
+  function reset() {
+    document.querySelectorAll('.edge, .node, .node-label, .node-sub, .sol-label, .miss-label, .pythos-core, .pythos-ring, .pythos-label, .trilemma, .footer, h1')
+      .forEach(el => {
+        el.classList.remove('run','pop','show','in','out');
+        el.style.animation = 'none';
+        void el.offsetWidth;
+        el.style.animation = '';
+      });
+    run();
+  }
+
+  function run() {
+    // 1. edges draw (each represents a solution covering 2 of 3)
+    const edges = ['.e1','.e2','.e3'];
+    edges.forEach((e, i) => {
+      setTimeout(() => $(e).classList.add('run'), 250 + i*250);
+    });
+    // solution labels + the third need each one misses
+    const sols = ['.s1','.s2','.s3'];
+    const misses = ['.m1','.m2','.m3'];
+    sols.forEach((s, i) => {
+      setTimeout(() => $(s).classList.add('show'), 600 + i*250);
+      setTimeout(() => $(misses[i]).classList.add('show'), 750 + i*250);
+    });
+    // 2. nodes pop
+    const nodes = ['.n1','.n2','.n3'];
+    const labels = ['.l1','.l2','.l3'];
+    const subs = ['.b1','.b2','.b3'];
+    nodes.forEach((n, i) => {
+      setTimeout(() => {
+        $(n).classList.add('pop');
+        $(labels[i]).classList.add('show');
+        $(subs[i]).classList.add('show');
+      }, 1500 + i*200);
+    });
+    // trilemma stamp appears with the triangle, breaks when Pythos arrives
+    setTimeout(() => document.querySelector('.trilemma').classList.add('show'), 1500);
+    setTimeout(() => {
+      const t = document.querySelector('.trilemma');
+      t.classList.remove('show');
+      t.classList.add('out');
+    }, 2400);
+
+    // 3. pythos core + rings
+    setTimeout(() => {
+      document.querySelectorAll('.pythos-ring').forEach((r, i) => {
+        setTimeout(() => r.classList.add('in'), i*350);
+      });
+      document.querySelector('.pythos-core').classList.add('in');
+      document.querySelector('.pythos-label').classList.add('in');
+    }, 2500);
+
+    // footer narration
+    //scenes.forEach(s => setTimeout(() => setText(s.msg), s.t * 1000));
+    setTimeout(() => replay.classList.add('show'), 4200);
+  }
+
+  const themeSwitch = $('#themeSwitch');
+  themeSwitch.addEventListener('change', () => {
+    document.documentElement.setAttribute('data-theme', themeSwitch.checked ? 'light' : 'dark');
+  });
+
+  replay.addEventListener('click', reset);
+  window.addEventListener('load', run);
+</script>
+</body>
+</html>
