@@ -388,7 +388,28 @@
     transition: opacity 0.4s, color 0.2s, border-color 0.2s;
   }
   .replay.show { opacity: 1; }
+  .replay.hide { opacity: 0; pointer-events: none; }
   .replay:hover { color: var(--ink); border-color: var(--accent); }
+
+  /* Replay control scoped to the Pythos Promise section —
+     shares the hero button's fixed bottom-right position */
+  .replay-promise {
+    position: fixed;
+    right: 18px;
+    bottom: 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--edge);
+    color: var(--muted);
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s, color 0.2s, border-color 0.2s;
+  }
+  .replay-promise.show { opacity: 1; pointer-events: auto; }
+  .replay-promise:hover { color: var(--ink); border-color: var(--accent); }
 
   /* scroll cue — hints at the Pythos Promise below the fold */
   .scroll-cue {
@@ -417,15 +438,6 @@
   .scroll-cue.show { opacity: 0.7; pointer-events: auto; }
   .scroll-cue:hover { color: var(--pythos); opacity: 1; }
   .scroll-cue .cue-arrow { display: block; }
-  .scroll-cue.show .cue-arrow { animation: cueBob 1.8s ease-in-out infinite; }
-
-  @keyframes cueBob {
-    0%, 100% { transform: translateY(0); }
-    50%      { transform: translateY(4px); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-cue.show .cue-arrow { animation: none; }
-  }
 
   .theme-toggle {
     position: fixed;
@@ -544,7 +556,7 @@
       padding: 0 8px;
       transform: none;
     }
-    .replay { right: 12px; bottom: 12px; }
+    .replay, .replay-promise { right: 12px; bottom: 12px; }
   }
 </style>
 </head>
@@ -688,11 +700,13 @@
         </ul>
       </article>
     </div>
+
+    <button class="replay-promise" id="replayPromise">↻ Replay</button>
   </section>
 
   <button class="replay" id="replay">↻ Replay</button>
 
-  <button class="scroll-cue" id="scrollCue" aria-label="Scroll to the Pythos Promise">
+  <button class="scroll-cue show" id="scrollCue" aria-label="Scroll to the Pythos Promise">
     <span>The Pythos Promise</span>
     <svg class="cue-arrow" width="22" height="12" viewBox="0 0 22 12" fill="none" aria-hidden="true">
       <path d="M2 2l9 8 9-8" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
@@ -708,10 +722,15 @@
   scrollCue.addEventListener('click', () => {
     document.getElementById('promise').scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  // dismiss the cue once the visitor starts scrolling
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 40) scrollCue.classList.remove('show');
-  }, { passive: true });
+
+  // hide the cue once the visitor reaches the bottom (nothing left to scroll)
+  const updateCue = () => {
+    const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    scrollCue.classList.toggle('show', !atBottom);
+  };
+  window.addEventListener('scroll', updateCue, { passive: true });
+  window.addEventListener('resize', updateCue, { passive: true });
+  updateCue();
 
   const scenes = [
     {
@@ -730,7 +749,7 @@
   }
 
   function reset() {
-    document.querySelectorAll('.edge, .node, .node-label, .node-sub, .sol-label, .miss-label, .pythos-core, .pythos-ring, .pythos-label, .trilemma, .footer, h1, .promise-head, .card')
+    document.querySelectorAll('.edge, .node, .node-label, .node-sub, .sol-label, .miss-label, .pythos-core, .pythos-ring, .pythos-label, .trilemma, .footer, h1')
       .forEach(el => {
         el.classList.remove('run','pop','show','in','out');
         el.style.animation = 'none';
@@ -784,19 +803,41 @@
     // footer narration
     //scenes.forEach(s => setTimeout(() => setText(s.msg), s.t * 1000));
 
-    // 4. Pythos Promise — reveal the three pillars once the core has settled
-    setTimeout(() => $('#promiseHead').classList.add('show'), 200);
-    ['#card1','#card2','#card3'].forEach((id, i) => {
-      setTimeout(() => $(id).classList.add('show'), 300 + i * 180);
-    });
-
     setTimeout(() => replay.classList.add('show'), 4200);
-
-    // scroll cue — only surface it if the visitor is still at the top
-    setTimeout(() => {
-      if (window.scrollY < 40) scrollCue.classList.add('show');
-    }, 4300);
   }
+
+  // Pythos Promise — reveal the header + three pillars only once the
+  // reader scrolls the section into view.
+  const promiseEls = ['#promiseHead','#card1','#card2','#card3'];
+  function revealPromise() {
+    $('#promiseHead').classList.add('show');
+    ['#card1','#card2','#card3'].forEach((id, i) => {
+      setTimeout(() => $(id).classList.add('show'), i * 180);
+    });
+  }
+  function replayPromise() {
+    promiseEls.forEach((id) => {
+      const el = $(id);
+      el.classList.remove('show');
+      el.style.animation = 'none';
+      void el.offsetWidth;   // force reflow so the animation can restart
+      el.style.animation = '';
+    });
+    revealPromise();
+  }
+  let promiseRevealed = false;
+  const promiseObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      // swap the two fixed Replay buttons: hero on page 1, Promise on page 2
+      replay.classList.toggle('hide', entry.isIntersecting);
+      $('#replayPromise').classList.toggle('show', entry.isIntersecting);
+      if (entry.isIntersecting && !promiseRevealed) {
+        promiseRevealed = true;
+        revealPromise();
+      }
+    });
+  }, { threshold: 0.25 });
+  promiseObserver.observe(document.getElementById('promise'));
 
   const themeSwitch = $('#themeSwitch');
   themeSwitch.addEventListener('change', () => {
@@ -804,6 +845,7 @@
   });
 
   replay.addEventListener('click', reset);
+  $('#replayPromise').addEventListener('click', replayPromise);
   window.addEventListener('load', run);
 </script>
 </body>
