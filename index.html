@@ -373,6 +373,75 @@
     opacity: 0.85;
   }
 
+  /* ---------- About us ---------- */
+  .about {
+    width: min(92vw, 900px);
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 64px 16px;
+  }
+  .about-head {
+    text-align: center;
+    margin-bottom: 52px;
+  }
+  .about-head .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--pythos);
+  }
+  .about-head h2 {
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    margin-top: 10px;
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .about-block {
+    padding: 30px 26px;
+    border: 1px solid var(--edge);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  :root[data-theme="light"] .about-block { background: rgba(255,255,255,0.7); }
+  .about-block:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .about-block h3 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--pythos);
+    margin-bottom: 16px;
+  }
+  .about-block p {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .about-block p + p { margin-top: 10px; }
+  .about-block .investor-logo {
+    display: block;
+    margin-top: 16px;
+    max-width: 180px;
+    width: 100%;
+    height: auto;
+    background: #fff;
+    padding: 12px 16px;
+    border-radius: 10px;
+  }
+  .about-block strong { color: var(--ink); font-weight: 600; }
+  .about-block a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .about-block a:hover { text-decoration: underline; }
+
   .replay {
     position: fixed;
     right: 18px;
@@ -517,6 +586,8 @@
   @media (max-width: 860px) {
     .promise-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
     .promise { padding-bottom: 64px; }
+    .about-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+    .about { padding-bottom: 64px; }
   }
 
   /* ---------- mobile / narrow screens ---------- */
@@ -704,6 +775,32 @@
     <button class="replay-promise" id="replayPromise">↻ Replay</button>
   </section>
 
+  <section class="about" id="about">
+    <div class="about-head">
+      <div class="eyebrow">About us</div>
+      <h2>Built by the people who built the GPUs</h2>
+    </div>
+
+    <div class="about-grid">
+      <div class="about-block">
+        <h3>Who we are</h3>
+        <p>We are a startup based in Silicon Valley. The founding team led iconic GPU programs at <strong>NVIDIA</strong>, <strong>Intel</strong>, and <strong>Google</strong> — shipping the first CUDA GPU, the first ARC GPU, and the core tech behind Google Stadia (cloud gaming platform).</p>
+      </div>
+
+      <div class="about-block">
+        <h3>Our investors</h3>
+        <p><strong>Engineering Capital</strong></p>
+        <img class="investor-logo" src="https://images.squarespace-cdn.com/content/v1/602fe8eef3f6185d8768e787/1619484854465-4HYD8PML6WHXW3KPLKP4/Artboard+1.png" alt="Engineering Capital logo" loading="lazy" />
+      </div>
+
+      <div class="about-block">
+        <h3>Get in touch</h3>
+        <p>To schedule a demo, <a href="https://outlook.office.com/bookwithme/user/7cbd6dda13a8422a9ebed9c6300f6389@cloudexe.tech/meetingtype/KqPI6ntTA0aZLVUIrODaGA2?anonymous&ismsaljsauthenabled&ep=mCardFromTile" target="_blank" rel="noopener">book time with us</a>.</p>
+        <p>Or send us an email at <a href="mailto:info@cloudexe.tech">info@cloudexe.tech</a>.</p>
+      </div>
+    </div>
+  </section>
+
   <button class="replay" id="replay">↻ Replay</button>
 
   <button class="scroll-cue show" id="scrollCue" aria-label="Scroll to the Pythos Promise">
@@ -719,14 +816,27 @@
   const replay = $('#replay');
   const scrollCue = $('#scrollCue');
 
+  const cueLabel = scrollCue.querySelector('span');
+  let cueTarget = 'promise';
+
   scrollCue.addEventListener('click', () => {
-    document.getElementById('promise').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById(cueTarget).scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
-  // hide the cue once the visitor reaches the bottom (nothing left to scroll)
+  // The cue points to the next page down and hides at the very bottom.
   const updateCue = () => {
     const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
-    scrollCue.classList.toggle('show', !atBottom);
+    if (atBottom) { scrollCue.classList.remove('show'); return; }
+    // pick the next section based on the middle of the viewport
+    const mid = window.scrollY + window.innerHeight / 2;
+    if (mid < document.getElementById('promise').offsetTop) {
+      cueTarget = 'promise';
+      cueLabel.textContent = 'The Pythos Promise';
+    } else {
+      cueTarget = 'about';
+      cueLabel.textContent = 'About us';
+    }
+    scrollCue.classList.add('show');
   };
   window.addEventListener('scroll', updateCue, { passive: true });
   window.addEventListener('resize', updateCue, { passive: true });
