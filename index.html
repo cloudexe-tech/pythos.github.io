@@ -668,6 +668,8 @@
   .ribbon-meta { min-width: 0; }
   .ribbon-name { font-size: 12px; font-weight: 700; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .ribbon-attribution { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* long titles wrap onto a second line instead of getting cut off */
+  .ribbon-attribution.wrap { white-space: normal; line-height: 1.35; }
 
   .replay {
     position: fixed;
@@ -1209,6 +1211,17 @@
             </div>
           </div>
 
+          <div class="ribbon-item">
+            <div class="ribbon-quote">"Cloudexe made it incredibly easy to extend our existing GPU infrastructure by attaching external GPUs alongside our internal GPUs."</div>
+            <div class="ribbon-footer">
+              <img class="ribbon-logo" src="images/redhat_logo.svg" alt="Red Hat" loading="lazy" />
+              <div class="ribbon-meta">
+                <div class="ribbon-name">Ravindra Patil</div>
+                <div class="ribbon-attribution wrap">Principal Technical Support Engineer · Red Hat</div>
+              </div>
+            </div>
+          </div>
+
           <!-- Duplicate set for seamless loop -->
           <div class="ribbon-item">
             <div class="ribbon-quote">"We switched due to their competitive pricing and reliability."</div>
@@ -1305,6 +1318,17 @@
               <div class="ribbon-meta">
                 <div class="ribbon-name">Victor Shirasuna</div>
                 <div class="ribbon-attribution">AI Research Scientist · PUC-Behring</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ribbon-item">
+            <div class="ribbon-quote">"Cloudexe made it incredibly easy to extend our existing GPU infrastructure by attaching external GPUs alongside our internal GPUs."</div>
+            <div class="ribbon-footer">
+              <img class="ribbon-logo" src="images/redhat_logo.svg" alt="Red Hat" loading="lazy" />
+              <div class="ribbon-meta">
+                <div class="ribbon-name">Ravindra Patil</div>
+                <div class="ribbon-attribution wrap">Principal Technical Support Engineer · Red Hat</div>
               </div>
             </div>
           </div>
