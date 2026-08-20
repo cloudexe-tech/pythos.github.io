@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pythos — In-VPC Managed Inference Platform</title>
 <link rel="icon" href="logo.ico" type="image/x-icon" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6RV2C031B3"></script>
 <script>
@@ -42,7 +45,7 @@
   html, body { height: 100%; }
   html { scroll-behavior: smooth; }
   /* keep anchored sections clear of the fixed navbar */
-  .hero, .promise, .tech, .about { scroll-margin-top: 62px; }
+  .hero, .why, .promise, .tech, .about { scroll-margin-top: 62px; }
   body {
     background: radial-gradient(1200px 800px at 50% 30%, var(--bg2), var(--bg) 70%);
     color: var(--ink);
@@ -60,44 +63,63 @@
     padding-top: 62px;
   }
 
+  /* the diagram sizes itself from the SVG's own aspect ratio, so the column
+     never reserves empty space above the triangle */
   .stage {
     position: relative;
-    flex: 1 1 46%;
-    width: min(46vw, 560px);
-    height: min(68vh, 520px);
-    flex-shrink: 0;
+    justify-self: center;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
   }
+  /* soft glow anchoring the diagram to its half of the row */
+  .stage::before {
+    content: "";
+    position: absolute;
+    inset: -6% -10% 6%;
+    background: radial-gradient(closest-side, rgba(79,107,255,0.10), transparent 78%);
+    pointer-events: none;
+  }
+  :root[data-theme="light"] .stage::before { background: radial-gradient(closest-side, rgba(79,107,255,0.08), transparent 78%); }
 
-  /* headline spans the full hero; copy and triangle sit side-by-side beneath it */
+  /* headline + lede span the full hero; copy and triangle sit side-by-side beneath */
   .hero-inner {
     display: flex;
     flex-direction: column;
-    gap: clamp(24px, 3vw, 44px);
-    width: min(92vw, 1200px);
+    gap: clamp(22px, 2.8vw, 38px);
+    width: min(92vw, 1080px);
   }
   .hero-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: center;
-    justify-content: center;
-    gap: clamp(32px, 6vw, 88px);
+    gap: clamp(28px, 4.5vw, 64px);
   }
   .hero-copy {
-    flex: 1 1 54%;
-    max-width: 620px;
+    justify-self: center;
+    width: 100%;
+    max-width: 520px;
   }
   .hero-headline {
-    font-size: clamp(34px, 4.8vw, 56px);
+    text-align: center;
+    text-wrap: balance;
+    font-size: clamp(34px, 5.2vw, 60px);
     font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.5px;
+    line-height: 1.06;
+    letter-spacing: -1.2px;
     opacity: 0;
     transform: translateY(-10px);
     animation: rise 0.9s 0.1s ease-out forwards;
   }
-  .hero-headline .brand { color: var(--pythos); }
-  /* headline roller: inline-grid stacks every phrase in one cell, so the box
+  /* second line, so the roller's fixed-width box never leaves a ragged gap
+     between the rotating phrase and the fixed one */
+  .hero-headline .brand { display: block; color: var(--pythos); }
+  /* headline roller: grid stacks every phrase in one cell, so the box
      is sized by the widest phrase and the rest of the headline never shifts */
-  .roller { display: inline-grid; vertical-align: bottom; text-align: center; font-style: italic; }
+  .roller { display: grid; text-align: center; font-style: italic; }
   .roller-item {
     grid-area: 1 / 1;
     opacity: 0;
@@ -110,12 +132,15 @@
     .roller-item { transition: none; transform: none; }
     .roller-item.is-leaving { transform: none; }
   }
+  /* full-width lede directly under the headline */
   .hero-sub {
-    margin-top: 22px;
-    max-width: 560px;
-    font-size: clamp(15px, 1.4vw, 18px);
+    margin: 0 auto;
+    max-width: 640px;
+    text-align: center;
+    text-wrap: balance;
+    font-size: clamp(15px, 1.35vw, 17.5px);
     font-weight: 400;
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--muted);
     opacity: 0;
     transform: translateY(10px);
@@ -124,34 +149,49 @@
   .hero-sub .em { color: var(--ink); font-weight: 600; }
   .hero-checks {
     list-style: none;
-    margin-top: 28px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 15px;
     opacity: 0;
     transform: translateY(10px);
     animation: rise 0.9s 0.35s ease-out forwards;
   }
   .hero-checks li {
     position: relative;
-    padding-left: 34px;
-    font-size: clamp(14px, 1.35vw, 18px);
+    padding-left: 32px;
+    font-size: clamp(14px, 1.2vw, 16.5px);
     font-weight: 600;
+    letter-spacing: -0.1px;
     color: var(--ink);
-    line-height: 1.4;
+    line-height: 1.45;
   }
+  /* tick drawn in the palette's green rather than an emoji, so the
+     three rows read as one designed element */
   .hero-checks li::before {
-    content: "\2705"; /* white heavy check mark — renders as a green check */
+    content: "";
     position: absolute;
     left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1em;
-    line-height: 1;
+    top: 0.12em;
+    width: 21px;
+    height: 21px;
+    border-radius: 50%;
+    background: rgba(53,208,127,0.13);
+    border: 1px solid rgba(53,208,127,0.45);
+  }
+  .hero-checks li::after {
+    content: "";
+    position: absolute;
+    left: 7.5px;
+    top: 0.38em;
+    width: 5px;
+    height: 9px;
+    border: solid var(--gc);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
   }
 
   .hero-cta {
-    margin-top: 34px;
+    margin-top: 30px;
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
@@ -187,25 +227,20 @@
   .btn-secondary:hover { border-color: var(--pythos); color: var(--pythos); }
 
   .tri-wrap {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 32px;
+    position: relative;
+    width: 100%;
     display: flex;
-    align-items: flex-end;
     justify-content: center;
   }
 
   .tri-caption {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
+    max-width: 100%;
     text-align: center;
-    font-size: clamp(12px, 1.15vw, 14px);
+    font-size: clamp(11.5px, 1.05vw, 13px);
     font-weight: 600;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
     color: var(--muted);
     opacity: 0;
     animation: rise 0.9s 0.55s ease-out forwards;
@@ -214,7 +249,7 @@
 
   svg.scene {
     width: 100%;
-    height: 100%;
+    height: auto;
     overflow: visible;
   }
 
@@ -354,6 +389,123 @@
     color: var(--muted);
     margin-top: 10px;
   }
+
+  /* ---------- Why Pythos ---------- */
+  .why {
+    width: min(92vw, 1100px);
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 118px 16px 64px;
+  }
+  .why-head {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .why-head .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--pythos);
+  }
+  .why-head h2 {
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    margin-top: 10px;
+  }
+  .why-head p {
+    max-width: 620px;
+    margin: 14px auto 0;
+    font-size: clamp(14px, 1.7vw, 16px);
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .why-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: clamp(28px, 4vw, 56px);
+  }
+  .why-stage { width: 100%; }
+  /* clipped, so the ball is out of frame until it drops in */
+  .why-stage svg { width: 100%; height: auto; display: block; overflow: hidden; }
+
+  /* staircase of cost levels the ball drops through */
+  .step-line {
+    stroke: var(--edge);
+    stroke-width: 4;
+    stroke-linecap: round;
+    transition: stroke 0.4s ease;
+  }
+  .level.lit .step-line { stroke: var(--muted); }
+  .level.floor .step-line { stroke: var(--pythos); }
+  .step-hatch { stroke: var(--edge); stroke-width: 2; opacity: 0.55; }
+  .level-title {
+    font-size: 13px;
+    font-weight: 700;
+    fill: var(--muted);
+    opacity: 0.4;
+    transition: opacity 0.4s ease, fill 0.4s ease;
+  }
+  .level-sub {
+    font-size: 11px;
+    fill: var(--muted);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .level.lit .level-title { opacity: 1; fill: var(--ink); }
+  .level.lit .level-sub { opacity: 0.85; }
+  .level.floor.lit .level-title { fill: var(--pythos); }
+  .axis-line { stroke: var(--edge); stroke-width: 1.5; }
+  .axis-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    fill: var(--muted);
+    opacity: 0.7;
+  }
+  .ball-body { fill: var(--pythos); filter: drop-shadow(0 3px 10px rgba(252,129,71,0.4)); }
+  .ball-text {
+    font-size: 13px;
+    font-weight: 800;
+    fill: #1a0e06;
+    text-anchor: middle;
+    dominant-baseline: central;
+    pointer-events: none;
+  }
+  .ball-shadow { fill: rgba(0,0,0,0.28); }
+  :root[data-theme="light"] .ball-shadow { fill: rgba(0,0,0,0.12); }
+
+  .why-copy { display: flex; flex-direction: column; gap: 18px; }
+  .why-tier {
+    padding: 16px 18px;
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.35s ease, background 0.35s ease;
+  }
+  :root[data-theme="light"] .why-tier { background: rgba(255,255,255,0.7); }
+  .why-tier.is-current { border-color: var(--pythos); }
+  .why-tier .tier-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 7px;
+  }
+  .why-tier .tier-level {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--pythos);
+    white-space: nowrap;
+  }
+  .why-tier h3 { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .why-tier p { font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .why-tier .tier-names { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); opacity: 0.8; }
 
   /* ---------- Pythos Promise ---------- */
   .promise {
@@ -840,6 +992,8 @@
 
   /* ---------- tablet / narrow desktop ---------- */
   @media (max-width: 860px) {
+    .why-row { grid-template-columns: 1fr; max-width: 520px; margin: 0 auto; }
+    .why { padding-bottom: 64px; }
     .promise-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
     .promise { padding-bottom: 64px; }
     .tech-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto 48px; }
@@ -857,49 +1011,31 @@
     .nav-links { margin-left: auto; gap: 12px; }
     .nav-links a { font-size: 12px; }
     .theme-toggle .icon { display: none; }
-    .hero, .promise, .tech, .about { scroll-margin-top: 54px; }
-    .promise, .tech, .about { padding-top: 90px; }
+    .hero, .why, .promise, .tech, .about { scroll-margin-top: 54px; }
+    .why, .promise, .tech, .about { padding-top: 90px; }
     /* stack copy and diagram in normal flow instead of side-by-side */
     .hero { min-height: auto; padding: 32px 0; padding-top: 86px; }
     .hero-inner {
       width: 100%;
-      gap: 8px;
+      gap: 18px;
       padding: 24px 12px;
     }
+    /* minmax(0,…) keeps the SVG's intrinsic width from widening the column */
     .hero-row {
-      flex-direction: column;
-      gap: 8px;
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: center;
+      gap: 22px;
     }
     .hero-copy { text-align: center; max-width: 100%; width: 100%; }
-    .hero-headline { font-size: clamp(28px, 8vw, 40px); text-align: center; }
-    .hero-sub { margin-left: auto; margin-right: auto; }
+    .hero-headline { font-size: clamp(28px, 8vw, 40px); letter-spacing: -0.6px; }
     .hero-checks {
       display: inline-flex;
       text-align: left;
-      margin: 26px auto 0;
+      margin: 4px auto 0;
       gap: 14px;
     }
-    .hero-cta { justify-content: center; }
-    .stage {
-      width: 100%;
-      height: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      padding: 8px 12px;
-    }
-    .tri-wrap {
-      position: static;
-      width: 100%;
-      height: auto;
-      inset: auto;
-      bottom: auto;
-    }
-    .tri-caption { position: static; margin-top: 4px; }
-    /* size the diagram by width so the whole viewBox (and its labels) stays visible */
-    svg.scene { width: 100%; height: auto; }
+    .hero-cta { justify-content: center; margin-top: 24px; }
+    .stage { max-width: 100%; padding: 0 4px; }
     .footer {
       position: static;
       margin-top: 10px;
@@ -916,14 +1052,15 @@
     <a class="nav-brand" href="#home"><img src="logo.ico" alt="" />Pythos</a>
     <div class="nav-links" id="navLinks">
       <a href="#home">Home</a>
-      <a href="#promise">Pythos Promise</a>
+      <a href="#why">Why Pythos</a>
+      <a href="#promise">Pythos Features</a>
       <a href="#tech">Technology</a>
       <a href="#about">About us</a>
     </div>
     <div class="theme-toggle">
       <span class="icon">🌙</span>
       <label class="switch">
-        <input type="checkbox" id="themeSwitch" aria-label="Toggle light/dark theme" />
+        <input type="checkbox" id="themeSwitch" checked aria-label="Toggle light/dark theme" />
         <span class="slider"></span>
       </label>
       <span class="icon">☀️</span>
@@ -932,15 +1069,22 @@
 
   <div class="hero" id="home">
   <div class="hero-inner">
-    <h1 class="hero-headline">Want to <span class="roller" id="heroRoller"><span class="roller-item is-active">run any open model</span><span class="roller-item">cut inference cost</span><span class="roller-item">scale on-demand</span></span> <span class="brand">right in your VPC?</span></h1>
+    <h1 class="hero-headline">
+      <span class="roller" id="heroRoller">
+      <span class="roller-item is-active">Cut inference cost</span>
+      <span class="roller-item">Scale on-demand</span>
+      <span class="roller-item">Keep your prompts</span>
+      </span>
+      <span class="brand">in your VPC</span></h1>
+    <p class="hero-sub">
+      Pythos is a managed, in-VPC inference platform. It delivers Scalability and Data Privacy with Zero Ops Overhead.
+      </p>
     <div class="hero-row">
     <div class="hero-copy">
-      <p class="hero-sub">Choice of inference platform can make or break your AI strategy. All other options force a choice between Scalability, Data Privacy and Ops Overhead. <span class="em">Pythos is the only answer that delivers all three.</span> Now you can deploy any open-weights models right in your VPC securely without the operational headache.</p>
       <ul class="hero-checks">
-        <li>Any open model</li>
-        <li>Lower latency</li>
-        <li>Higher Availability</li>
-        <li>Lower Cost</li>
+        <li>Data stays within your security perimeter</li>
+        <li>No changes to security controls and operational workflows</li>
+        <li>Better cost, latency, availability</li>
       </ul>
       <div class="hero-cta">
         <!--
@@ -952,7 +1096,9 @@
 
     <div class="stage">
     <div class="tri-wrap">
-      <svg class="scene" viewBox="0 0 600 452" preserveAspectRatio="xMidYMax meet" aria-label="Needs triangle">
+      <!-- viewBox cropped to the drawing's real bounds so the column reserves
+           no empty band above the apex label -->
+      <svg class="scene" viewBox="0 52 600 396" preserveAspectRatio="xMidYMid meet" aria-label="Needs triangle">
         <defs>
           <!-- gradients run along each edge, from one vertex color to the other -->
           <linearGradient id="grad1" gradientUnits="userSpaceOnUse" x1="300" y1="110" x2="110" y2="400">
@@ -1041,9 +1187,90 @@
   </div>
   </div>
 
+  <section class="why" id="why">
+    <div class="why-head">
+      <div class="eyebrow">Why Pythos</div>
+      <h2>Inference cost has a floor. Pythos sits on it.</h2>
+      <p>Every step down the stack strips out a layer of cost. Pythos is the last step — there is nothing below your own VPC.</p>
+    </div>
+
+    <div class="why-row">
+      <div class="why-stage">
+        <svg viewBox="0 0 560 430" role="img" aria-label="A dollar ball bouncing down three cost levels: status quo, other inference providers, and Pythos at the floor.">
+          <!-- cost axis -->
+          <line class="axis-line" x1="16" y1="66" x2="16" y2="392" />
+          <polygon class="axis-line" points="10,388 22,388 16,400" fill="currentColor" style="fill: var(--edge);" />
+          <text class="axis-label" x="16" y="56" text-anchor="middle">$</text>
+          <text class="axis-label" transform="translate(11,240) rotate(-90)" text-anchor="middle">COST</text>
+
+          <!-- level 0 — status quo -->
+          <g class="level" id="lvl0">
+            <line class="step-line" x1="34" y1="108" x2="210" y2="108" />
+            <text class="level-title" x="42" y="136">Level 0 · Status quo</text>
+            <text class="level-sub" x="42" y="154">
+              <tspan x="42">Azure Foundry · AWS Bedrock</tspan>
+              <tspan x="42" dy="15">GCP Vertex</tspan>
+            </text>
+          </g>
+
+          <!-- level -1 — specialist inference clouds -->
+          <g class="level" id="lvl1">
+            <line class="step-line" x1="210" y1="232" x2="386" y2="232" />
+            <text class="level-title" x="218" y="260">Level −1 · Inference providers</text>
+            <text class="level-sub" x="218" y="278">
+              <tspan x="218">Baseten · Together · Fireworks</tspan>
+            </text>
+          </g>
+
+          <!-- level -2 — the floor -->
+          <g class="level floor" id="lvl2">
+            <line class="step-line" x1="386" y1="340" x2="548" y2="340" />
+            <!-- hatching marks the hard floor: nothing goes lower -->
+            <g class="step-hatch">
+              <line x1="390" y1="344" x2="380" y2="358" />
+              <line x1="410" y1="344" x2="400" y2="358" />
+              <line x1="430" y1="344" x2="420" y2="358" />
+              <line x1="450" y1="344" x2="440" y2="358" />
+              <line x1="470" y1="344" x2="460" y2="358" />
+              <line x1="490" y1="344" x2="480" y2="358" />
+              <line x1="510" y1="344" x2="500" y2="358" />
+              <line x1="530" y1="344" x2="520" y2="358" />
+              <line x1="550" y1="344" x2="540" y2="358" />
+            </g>
+            <text class="level-title" x="394" y="382">Level −2 · Pythos</text>
+            <text class="level-sub" x="394" y="400">
+              <tspan x="394">Right in your VPC — the floor</tspan>
+            </text>
+          </g>
+
+          <ellipse class="ball-shadow" id="whyShadow" cx="70" cy="108" rx="20" ry="4" opacity="0" />
+          <ellipse class="ball-body" id="whyBall" cx="70" cy="-40" rx="22" ry="22" />
+          <text class="ball-text" id="whyBallText" x="70" y="-40">$$$</text>
+        </svg>
+      </div>
+
+      <div class="why-copy">
+        <div class="why-tier" id="tier0">
+          <div class="tier-head"><span class="tier-level">LEVEL 0</span><h3>The status quo</h3></div>
+          <p>Hyperscaler model endpoints are the easy default. Most expensive, fewer models, no operational control.
+            <span class="tier-names">Azure AI Foundry · AWS Bedrock · GCP Vertex</span></p>
+        </div>
+        <div class="why-tier" id="tier1">
+          <div class="tier-head"><span class="tier-level">LEVEL −1</span><h3>Other inference providers</h3></div>
+          <p>Specialist clouds cut the per-token price and widen model choice, but your prompts and data still leave your perimeter to get there.
+            <span class="tier-names">Baseten · Together · Fireworks</span></p>
+        </div>
+        <div class="why-tier" id="tier2">
+          <div class="tier-head"><span class="tier-level">LEVEL −2</span><h3>Pythos</h3></div>
+          <p>Pythos brings an economically superior computing substrate inside your security perimeter. Zero changes to compliance and security posture. Data stays inside the perimeter.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="promise" id="promise">
     <div class="promise-head" id="promiseHead">
-      <div class="eyebrow">The Pythos Promise</div>
+      <div class="eyebrow">Pythos Features</div>
       <h2>All three needs, met at once</h2>
       <p>What used to force a trade-off is now a single guarantee, delivered inside your own AWS, Azure, or GCP footprint.</p>
     </div>
@@ -1490,6 +1717,141 @@
     });
   }, { threshold: 0.25 });
   promiseObserver.observe(document.getElementById('promise'));
+
+  /* ---------- Why Pythos: the $ ball bouncing down to the cost floor ---------- */
+  (() => {
+    const ball = $('#whyBall');
+    const ballText = $('#whyBallText');
+    const shadow = $('#whyShadow');
+    if (!ball) return;
+
+    // each step is a landing: x-range it spans, its height, and how the ball reads there
+    const steps = [
+      { x0: 34,  x1: 210, y: 108, r: 22, label: '$$$', el: $('#lvl0'), tier: $('#tier0') },
+      { x0: 210, x1: 386, y: 232, r: 17, label: '$$',  el: $('#lvl1'), tier: $('#tier1') },
+      { x0: 386, x1: 548, y: 340, r: 13, label: '$',   el: $('#lvl2'), tier: $('#tier2') },
+    ];
+    const G = 1350;        // gravity, px/s²
+    const BOUNCE = 0.62;   // restitution
+    const VX = 118;        // px/s the ball drifts to the right
+    const REST_VY = 55;    // below this, the bounce is done
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let x, y, vx, vy, squash, landed, settled, settledAt, raf = null;
+
+    const stepAt = (px) => {
+      for (let i = 0; i < steps.length; i++) {
+        if (px < steps[i].x1 || i === steps.length - 1) return i;
+      }
+      return steps.length - 1;
+    };
+
+    const land = (i) => {
+      if (i <= landed) return;
+      landed = i;
+      steps.forEach((s, n) => {
+        s.el.classList.toggle('lit', n <= i);
+        s.tier.classList.toggle('is-current', n === i);
+      });
+      ballText.textContent = steps[i].label;
+    };
+
+    const draw = () => {
+      const s = steps[stepAt(x)];
+      const r = steps[Math.max(landed, 0)].r;
+      // squash on impact, easing back to a circle
+      const rx = r * (1 + 0.3 * squash);
+      const ry = r * (1 - 0.3 * squash);
+      ball.setAttribute('rx', rx.toFixed(2));
+      ball.setAttribute('ry', ry.toFixed(2));
+      ball.setAttribute('cx', x.toFixed(2));
+      ball.setAttribute('cy', y.toFixed(2));
+      ballText.setAttribute('x', x.toFixed(2));
+      ballText.setAttribute('y', y.toFixed(2));
+      // shadow tightens as the ball nears its landing
+      const drop = Math.max(0, s.y - (y + ry));
+      shadow.setAttribute('cx', x.toFixed(2));
+      shadow.setAttribute('cy', (s.y + 3).toFixed(2));
+      shadow.setAttribute('rx', (r * (1 - Math.min(drop, 140) / 260)).toFixed(2));
+      shadow.setAttribute('opacity', (0.45 * (1 - Math.min(drop, 140) / 160)).toFixed(3));
+    };
+
+    const reset = () => {
+      x = 70; y = -40; vx = VX; vy = 0;
+      squash = 0; landed = -1; settled = false; settledAt = 0;
+      steps.forEach((s) => { s.el.classList.remove('lit'); s.tier.classList.remove('is-current'); });
+      ballText.textContent = steps[0].label;
+      draw();
+    };
+
+    const finish = () => {
+      x = 465; y = steps[2].y - steps[2].r; vx = 0; vy = 0; squash = 0;
+      land(0); land(1); land(2);
+      draw();
+    };
+
+    let last = 0;
+    const frame = (t) => {
+      raf = requestAnimationFrame(frame);
+      const dt = Math.min((t - last) / 1000, 0.032); // clamp so a stalled tab can't teleport the ball
+      last = t;
+
+      if (settled) {
+        if (t - settledAt > 1800) { reset(); last = t; }
+        return;
+      }
+
+      const i = stepAt(x);
+      const s = steps[i];
+      const r = steps[Math.max(landed, 0)].r;
+
+      vy += G * dt;
+      y += vy * dt;
+      x += vx * dt;
+      squash = Math.max(0, squash - dt / 0.16);
+
+      if (y + r >= s.y && vy > 0) {
+        y = s.y - r;
+        land(i);
+        squash = Math.min(1, Math.abs(vy) / 700);
+        vy = -vy * BOUNCE;
+        if (Math.abs(vy) < REST_VY) vy = 0;
+      }
+
+      // on the floor the ball rolls to a stop — there is no level below it
+      if (i === steps.length - 1) {
+        vx = Math.max(0, vx - 90 * dt);
+        if (vx === 0 && vy === 0 && Math.abs(y + r - s.y) < 0.5) {
+          settled = true;
+          settledAt = t;
+        }
+      }
+      draw();
+    };
+
+    const start = () => {
+      if (raf !== null) return;
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
+    };
+    const stop = () => {
+      if (raf === null) return;
+      cancelAnimationFrame(raf);
+      raf = null;
+    };
+
+    if (reduced) {
+      finish();
+    } else {
+      reset();
+      // only animate while the section is on screen; restart it on the way back in
+      new IntersectionObserver((entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) { reset(); start(); } else { stop(); }
+        });
+      }, { threshold: 0.3 }).observe($('#why'));
+    }
+  })();
 
   const themeSwitch = $('#themeSwitch');
   themeSwitch.addEventListener('change', () => {
