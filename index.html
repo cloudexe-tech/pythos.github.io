@@ -199,6 +199,66 @@
     transform: translateY(10px);
     animation: rise 0.9s 0.45s ease-out forwards;
   }
+  /* compliance chip under the CTA */
+  .hero-trust {
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 10px 12px;
+    border: 1px solid var(--edge);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.03);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: rise 0.9s 0.55s ease-out forwards;
+  }
+  :root[data-theme="light"] .hero-trust { background: rgba(255,255,255,0.75); }
+  .trust-mark {
+    width: 34px;
+    height: 34px;
+    flex-shrink: 0;
+  }
+  .trust-shield {
+    fill: rgba(53,208,127,0.12);
+    stroke: var(--gc);
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+  }
+  .trust-tick {
+    fill: none;
+    stroke: var(--gc);
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .trust-copy { display: flex; flex-direction: column; gap: 2px; line-height: 1.35; }
+  .trust-copy strong {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    color: var(--ink);
+  }
+  .trust-copy span {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+  .trust-link {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+    border-left: 1px solid var(--edge);
+    font-size: 12.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    color: var(--pythos);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+  .trust-link:hover { text-decoration: underline; opacity: 0.85; }
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -1035,6 +1095,7 @@
       gap: 14px;
     }
     .hero-cta { justify-content: center; margin-top: 24px; }
+    .hero-trust { margin: 18px auto 0; }
     .stage { max-width: 100%; padding: 0 4px; }
     .footer {
       position: static;
@@ -1091,6 +1152,20 @@
         <a class="btn btn-secondary" href="mailto:info@cloudexe.tech?subject=Pythos%20trial%20access">Start a trial</a>
         -->
         <a class="btn btn-primary" href="https://outlook.office.com/bookwithme/user/7cbd6dda13a8422a9ebed9c6300f6389@cloudexe.tech/meetingtype/KqPI6ntTA0aZLVUIrODaGA2?anonymous&ismsaljsauthenabled&ep=mCardFromTile" target="_blank" rel="noopener">Book a Demo</a>
+      </div>
+
+      <!-- compliance badge: swap the inline mark for the licensed AICPA SOC seal
+           artwork when it is available -->
+      <div class="hero-trust">
+        <svg class="trust-mark" viewBox="0 0 48 48" role="img" aria-label="SOC 2 Type II certified">
+          <path class="trust-shield" d="M24 4.5 39.5 10.2 V24 c0 9.8-6.2 17.1-15.5 19.8C14.7 41.1 8.5 33.8 8.5 24 V10.2 Z" />
+          <path class="trust-tick" d="M16.8 24.2 l5 5 9.4-10.4" />
+        </svg>
+        <span class="trust-copy">
+          <strong>SOC&nbsp;2 Type&nbsp;II certified</strong>
+          <span>Independently audited controls</span>
+        </span>
+        <a class="trust-link" href="mailto:support@cloudexe.tech?subject=SOC%202%20Type%20II%20report%20request&amp;body=Please%20send%20the%20Pythos%20SOC%202%20Type%20II%20report.">Request report</a>
       </div>
     </div>
 
