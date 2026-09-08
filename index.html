@@ -769,6 +769,27 @@
   .about-block strong { color: var(--ink); font-weight: 600; }
   .about-block a { color: var(--accent); text-decoration: none; font-weight: 600; }
   .about-block a:hover { text-decoration: underline; }
+  .about-block.team { grid-column: 1 / -1; }
+  .team-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px 32px;
+  }
+  .team-member .name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .team-member .role {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .team-member .linkedin {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 13px;
+  }
 
   /* ---------- Technology ---------- */
   .tech {
@@ -1662,6 +1683,22 @@
         <h3>Get in touch</h3>
         <p>To schedule a demo, <a href="https://outlook.office.com/bookwithme/user/7cbd6dda13a8422a9ebed9c6300f6389@cloudexe.tech/meetingtype/KqPI6ntTA0aZLVUIrODaGA2?anonymous&ismsaljsauthenabled&ep=mCardFromTile" target="_blank" rel="noopener">book time with us</a>.</p>
         <p>Or send us an email at <a href="mailto:info@cloudexe.tech">info@cloudexe.tech</a>.</p>
+      </div>
+
+      <div class="about-block team">
+        <h3>Team</h3>
+        <div class="team-list">
+          <div class="team-member">
+            <div class="name">Makarand Dharmapurikar</div>
+            <div class="role">Founder/CEO</div>
+            <a class="linkedin" href="https://www.linkedin.com/in/makarand-dharmapurikar-384771/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+          <div class="team-member">
+            <div class="name">Siddharth Swarup</div>
+            <div class="role">COO</div>
+            <a class="linkedin" href="https://www.linkedin.com/in/siddharth-swarup-290471/" target="_blank" rel="noopener">LinkedIn</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
