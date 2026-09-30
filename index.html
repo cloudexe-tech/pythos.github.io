@@ -45,7 +45,7 @@
   html, body { height: 100%; }
   html { scroll-behavior: smooth; }
   /* keep anchored sections clear of the fixed navbar */
-  .hero, .why, .promise, .tech, .about { scroll-margin-top: 62px; }
+  .hero, .why, .promise, .tech, .blogs, .about { scroll-margin-top: 62px; }
   body {
     background: radial-gradient(1200px 800px at 50% 30%, var(--bg2), var(--bg) 70%);
     color: var(--ink);
@@ -189,6 +189,22 @@
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
   }
+
+  /* inline pointer from a hero claim to the post that argues it */
+  .hero-checks .why-link {
+    margin-left: 8px;
+    font-size: 0.82em;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .hero-checks .why-link::before {
+    content: "·";
+    margin-right: 8px;
+    color: var(--muted);
+  }
+  .hero-checks .why-link:hover { text-decoration: underline; }
 
   .hero-cta {
     margin-top: 30px;
@@ -791,6 +807,88 @@
     font-size: 13px;
   }
 
+  /* ---------- Blogs ---------- */
+  .blogs {
+    width: min(92vw, 900px);
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 118px 16px 64px;
+  }
+  .blogs-head {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .blogs-head .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--pythos);
+  }
+  .blogs-head h2 {
+    font-size: clamp(22px, 3.2vw, 32px);
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    margin-top: 10px;
+  }
+  .blogs-head p {
+    max-width: 620px;
+    margin: 14px auto 0;
+    font-size: clamp(14px, 1.7vw, 16px);
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .blogs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  /* Cards are rendered here rather than by Substack's embed.js: that script upgrades
+     only the first .substack-post-embed on a page, and a blocked or slow iframe leaves
+     an empty card behind. These always paint and follow the site theme. */
+  .blog-card {
+    display: flex;
+    flex-direction: column;
+    padding: 28px 26px;
+    border: 1px solid var(--edge);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.03);
+    text-decoration: none;
+    transition: transform 0.25s ease, border-color 0.25s ease;
+  }
+  :root[data-theme="light"] .blog-card { background: rgba(255,255,255,0.7); }
+  .blog-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+  .blog-card .blog-meta {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--pythos);
+  }
+  .blog-card h3 {
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+    color: var(--ink);
+  }
+  .blog-card p {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--muted);
+  }
+  .blog-card .read-more {
+    margin-top: 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .blog-card:hover .read-more { text-decoration: underline; }
+
   /* ---------- Technology ---------- */
   .tech {
     width: min(92vw, 1040px);
@@ -997,6 +1095,7 @@
     transform: scaleX(0);
     transition: transform 0.25s ease;
   }
+  .nav-short { display: none; }
   .nav-links a:hover { color: var(--ink); }
   .nav-links a.active { color: var(--ink); }
   .nav-links a.active::after { transform: scaleX(1); }
@@ -1081,19 +1180,34 @@
     .tech { padding-bottom: 64px; }
     .about-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
     .about { padding-bottom: 64px; }
+    .blogs-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+    .blogs { padding-bottom: 64px; min-height: auto; }
   }
 
   /* ---------- mobile / narrow screens ---------- */
   @media (max-width: 700px) {
-    /* navbar: drop the wordmark and tighten links so all four still fit one row */
-    .navbar { height: 54px; gap: 10px; padding: 0 10px; }
+    /* navbar: drop the wordmark and tighten links so all of them still fit one row */
+    .navbar { height: 54px; gap: 8px; padding: 0 8px; }
     .nav-brand { margin-right: 0; font-size: 0; gap: 0; }
     .nav-brand img { width: 24px; height: 24px; }
-    .nav-links { margin-left: auto; gap: 12px; }
-    .nav-links a { font-size: 12px; }
+    /* six labels won't fit a phone row at full length: swap in the short forms,
+       and keep the strip on one line (scrollable) as a floor for tiny screens */
+    .nav-links {
+      margin-left: auto;
+      gap: 12px;
+      flex-wrap: nowrap;
+      min-width: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-links::-webkit-scrollbar { display: none; }
+    .nav-links a { font-size: 12px; white-space: nowrap; }
+    .nav-long { display: none; }
+    .nav-short { display: inline; }
     .theme-toggle .icon { display: none; }
-    .hero, .why, .promise, .tech, .about { scroll-margin-top: 54px; }
-    .why, .promise, .tech, .about { padding-top: 90px; }
+    .hero, .why, .promise, .tech, .blogs, .about { scroll-margin-top: 54px; }
+    .why, .promise, .tech, .blogs, .about { padding-top: 90px; }
     /* stack copy and diagram in normal flow instead of side-by-side */
     .hero { min-height: auto; padding: 32px 0; padding-top: 86px; }
     .hero-inner {
@@ -1134,10 +1248,11 @@
     <a class="nav-brand" href="#home"><img src="logo.ico" alt="" />Pythos</a>
     <div class="nav-links" id="navLinks">
       <a href="#home">Home</a>
-      <a href="#why">Why Pythos</a>
-      <a href="#promise">Pythos Features</a>
-      <a href="#tech">Technology</a>
-      <a href="#about">About us</a>
+      <a href="#why"><span class="nav-long">Why Pythos</span><span class="nav-short">Why</span></a>
+      <a href="#promise"><span class="nav-long">Pythos Features</span><span class="nav-short">Features</span></a>
+      <a href="#tech"><span class="nav-long">Technology</span><span class="nav-short">Tech</span></a>
+      <a href="#blogs">Blogs</a>
+      <a href="#about"><span class="nav-long">About us</span><span class="nav-short">About</span></a>
     </div>
     <div class="theme-toggle">
       <span class="icon">🌙</span>
@@ -1164,8 +1279,8 @@
     <div class="hero-row">
     <div class="hero-copy">
       <ul class="hero-checks">
-        <li>Data stays within your security perimeter</li>
-        <li>No changes to security controls and operational workflows</li>
+        <li>Data stays within your security perimeter<a class="why-link" href="https://makaranddharmapurikar.substack.com/p/trust-only-when-you-cant-verify" target="_blank" rel="noopener">Why this matters</a></li>
+        <li>No changes to security controls and operational workflows<a class="why-link" href="https://makaranddharmapurikar.substack.com/p/decisions-outlive-their-reasons" target="_blank" rel="noopener">Why this matters</a></li>
         <li>Better cost, latency, availability</li>
       </ul>
       <div class="hero-cta">
@@ -1658,6 +1773,30 @@
 
         </div>
       </div>
+    </div>
+  </section>
+
+  <section class="blogs" id="blogs">
+    <div class="blogs-head">
+      <div class="eyebrow">Blogs</div>
+      <h2>What we're thinking about</h2>
+      <p>Notes on inference infrastructure, confidential computing, and the economics of compute placement.</p>
+    </div>
+
+    <div class="blogs-grid">
+      <a class="blog-card" href="https://makaranddharmapurikar.substack.com/p/trust-only-when-you-cant-verify" target="_blank" rel="noopener">
+        <div class="blog-meta">Sep 29, 2026 · Makarand Dharmapurikar</div>
+        <h3>Trust Only When You Can't Verify</h3>
+        <p>Trust, But Verify was good advice during the cold war. What does it mean today, when AI handles our most valuable data?</p>
+        <div class="read-more">Read on Substack →</div>
+      </a>
+
+      <a class="blog-card" href="https://makaranddharmapurikar.substack.com/p/decisions-outlive-their-reasons" target="_blank" rel="noopener">
+        <div class="blog-meta">Sep 10, 2026 · Makarand Dharmapurikar</div>
+        <h3>Decisions outlive their reasons</h3>
+        <p>Inference infrastructure improves every few weeks, in unpredictable ways. Institutional workflows change over years.</p>
+        <div class="read-more">Read on Substack →</div>
+      </a>
     </div>
   </section>
 
